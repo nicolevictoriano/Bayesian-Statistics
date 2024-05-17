@@ -1,0 +1,227 @@
+import pandas as pd
+import math
+import numpy as np
+
+sample_size = 0
+population_size = None 
+margin_of_error = None
+z_score = None
+sample_proportion = None
+s_deviation = None
+
+
+print ("\nSAMPLE SIZE CALCULATOR\n")
+print ("Hi, researchers!")
+print ("\n    \u2713 Determine the sample size formula based on the data availability.")
+print ("    \u2713 To log out, type 'exit' on the first line.\n\n")
+
+print("CODE \t\t FORMULA TYPE \t\t\t\t\t\tREQUIRED DATA\n")
+print("SS1 \t Slovin's Formula \t\t\t\t Population Size, Margin of Error")
+print ("SS2 \t Known Population Formula \t\t Population Size, Margin of Error, Z-score, Sample \t\t\t\t\t\t\t\t\t\t\t\t Proportion ")
+print("SS3 \t Unknown Population Formula \t Margin of Error, Z-score, Standard Deviation")
+print("SS4 \t Unknown Population Formula \t Margin of Error, Z-score, Sample Proportion")
+
+while True:
+    code = input ("Enter the code: ")
+    if code.lower () == "ss1":
+        while True:
+            choice = int (input ("Do you want to (1) input the data or (2) import data from Excel?: "))
+            if choice == 1 or choice == 2:
+                break
+            else:
+                print("Invalid input. Choose between 1 and 2 only.")
+        if choice == 1:
+            while True: 
+                population_size = float(input("Enter the population size: "))
+                if population_size > 0:
+                    break
+                else:
+                    print("Invalid input. Population size must be greater than 0.\n")
+            
+            while True: 
+                margin_of_error = float (input ("Enter the margin of error: "))
+                if margin_of_error <= 1 and margin_of_error >= 0:
+                    break
+                else:
+                    print("Invalid input. Margin of error should range from 0 to 1.\n")
+            sample_size = math.ceil(population_size / (1 + population_size*(margin_of_error**2)))
+            print (f"\nThe recommended sample size is {sample_size}")
+        
+        elif choice == 2:
+            
+            try:
+                excel_file = input('Enter the path of the Excel file: ')
+                file = pd.read_excel(excel_file)
+                print()
+                column_names = ["Population","Margin of Error"]
+                file.columns = column_names
+                margin_of_error=(file['Margin of Error']*file['Margin of Error'])
+                denominator=(1 + file['Population']*(margin_of_error))               
+                
+                sample_size=((file['Population'])/denominator).apply(np.ceil)
+                file['Sample Size'] = sample_size.astype(int)
+                print(file.to_string(index=False))
+            
+            except Exception as e:
+                print(f"Error: {e}")
+    
+    elif code.lower () == "ss2":
+        while True:
+            choice = int (input ("Do you want to (1) input the data or (2) import data from Excel?: "))
+            if choice == 1 or choice == 2:
+                break
+            else:
+                print("Invalid input. Choose between 1 and 2 only.")
+        if choice == 1:
+            while True: 
+                population_size = float(input("Enter the population size: "))
+                if population_size > 0:
+                    break
+                else:
+                    print("Invalid input. Population size must be greater than 0.\n")
+            while True: 
+                margin_of_error = float (input ("Enter the margin of error: "))
+                if margin_of_error <= 1 and margin_of_error >= 0:
+                    break
+                else:
+                    print("Invalid input. Margin of error should range from 0 to 1.\n")
+            while True: 
+                z_score = float (input ("Enter the z-score: "))
+                if margin_of_error <= 3 and margin_of_error >= -3:
+                    break
+                else:
+                    print("Invalid input. Z-Score should range from -3 to 3.\n")
+            while True: 
+                sample_proportion = float (input ("Enter the sample proportion: "))
+                if sample_proportion <= 1 and sample_proportion >= 0:
+                    break
+                else:
+                    print("Invalid input. Sample proportion should range from 0 to 1.\n")
+            numerator = ((z_score**2)*sample_proportion*(1-sample_proportion))/(margin_of_error**2) 
+            denominator = 1 + ((z_score**2)*sample_proportion*(1-sample_proportion))/((margin_of_error**2)*population_size)
+            sample_size = math.ceil(numerator/denominator)
+            print (f"The recommended sample size is {sample_size}.")
+    
+        elif choice==2:
+            try:
+                excel_file = input('Enter the path of the Excel file: ')
+                file = pd.read_excel(excel_file)
+                column_names = ["Population", "Margin of Error","Z-score","Sample Proportion"]
+                file.columns = column_names
+                z_score=(file['Z-score']**2)
+                sample_proportion=file["Sample Proportion"]*(1-file["Sample Proportion"]) 
+                margin_of_error = file['Margin of Error']**2
+                numerator=(z_score*sample_proportion)/margin_of_error
+                Ne = file["Population"]*margin_of_error
+                denominator=1+(z_score*sample_proportion/Ne)
+                
+                sample_size=(numerator/denominator).apply(np.ceil)
+                file['Sample Size'] = sample_size.astype(int)
+                print(file.to_string(index=False))
+                
+                
+            except Exception as e:
+                print(f"Error: {e}")
+    
+    elif code.lower () == "ss3":
+        while True:
+            choice = int (input ("Do you want to (1) input the data or (2) import data from Excel?: "))
+            if choice == 1 or choice == 2:
+                break
+            else:
+                print("Invalid input. Choose between 1 and 2 only.")
+        if choice == 1:
+            while True: 
+                margin_of_error = float (input ("Enter the margin of error: "))
+                if margin_of_error <= 1 and margin_of_error >= 0:
+                    break
+                else:
+                    print("Invalid input. Margin of error should range from 0 to 1.\n")
+            while True: 
+                z_score = float (input ("Enter the z-score: "))
+                if margin_of_error <= 3 and margin_of_error >= -3:
+                    break
+                else:
+                    print("Invalid input. Z-Score should range from -3 to 3.\n") 
+            while True: 
+                s_deviation = float (input ("Enter the standard deviation: "))
+                if s_deviation >= 0:
+                    break
+                else:
+                    print("Invalid input. Standard deviation should be greater than 0.\n")
+            sample_size = math.ceil(((z_score**2)*(s_deviation**2))/margin_of_error**2)
+            print (f"The recommended sample size is {sample_size}.")
+    
+        elif choice==2:
+            try:
+                excel_file = input('Enter the path of the Excel file: ')
+                file = pd.read_excel(excel_file)
+                column_names = ["Margin of Error","Z-score","Standard Deviation"]
+                file.columns = column_names
+                z_score=(file['Z-score']**2)
+                s_deviation=file["Standard Deviation"]**2
+                numerator=z_score*s_deviation
+                denominator=file['Margin of Error']**2
+                
+                sample_size=(numerator/denominator).apply(np.ceil)
+                file['Sample Size'] = sample_size.astype(int)
+                print(file.to_string(index=False))
+                
+            except Exception as e:
+                print(f"Error: {e}")
+                
+    elif code.lower () == "ss4":
+        while True:
+            choice = int (input ("Do you want to (1) input the data or (2) import data from Excel?: "))
+            if choice == 1 or choice == 2:
+                break
+            else:
+                print("Invalid input. Choose between 1 and 2 only.")
+        if choice == 1:
+            while True: 
+                margin_of_error = float (input ("Enter the margin of error: "))
+                if margin_of_error <= 1 and margin_of_error >= 0:
+                    break
+                else:
+                    print("Invalid input. Margin of error should range from 0 to 1.\n")
+            while True: 
+                z_score = float (input ("Enter the z-score: "))
+                if margin_of_error <= 3 and margin_of_error >= -3:
+                    break
+                else:
+                    print("Invalid input. Z-Score should range from -3 to 3.\n") 
+            while True: 
+                sample_proportion = float (input ("Enter the sample proportion: "))
+                if sample_proportion <= 1 and sample_proportion >= 0:
+                    break
+                else:
+                    print("Invalid input. Sample proportion should range from 0 to 1.\n")
+            
+            sample_size = math.ceil(((z_score**2)*sample_proportion*(1-sample_proportion))/(margin_of_error**2))
+            print()
+            print (f"The recommended sample size is {sample_size}.")
+    
+        elif choice==2:
+            try:
+                excel_file = input('Enter the path of the Excel file: ')
+                file = pd.read_excel(excel_file)
+                column_names = ["Margin of Error","Z-score","Sample Proportion"]
+                file.columns = column_names
+                z_score=(file['Z-score']**2)
+                sample_proportion=file["Sample Proportion"]*(1-file["Sample Proportion"])
+                numerator=z_score*sample_proportion
+                denominator=file["Margin of Error"]**2
+                
+                sample_size=(numerator/denominator).apply(np.ceil)
+                file['Sample Size'] = sample_size.astype(int)
+                print(file.to_string(index=False))
+                
+            except Exception as e:
+                print(f"Error: {e}")
+    
+    elif code.lower () == "exit" :
+        print ("\nThank you for using our Sample Size Calculator!")
+        break
+ 
+    else:
+        print ("Invalid input. Please try again.")
