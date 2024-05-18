@@ -1,4 +1,6 @@
 #@author: NicoleVictoriano
+#source: https://h1ros.github.io/posts/bayesian-regression-using-pymc3/
+
 
 import pandas as pd
 import numpy as np
