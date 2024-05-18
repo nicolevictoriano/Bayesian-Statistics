@@ -1,3 +1,5 @@
+#@author: NicoleVictoriano
+
 import scipy.stats as sts
 import numpy as np
 import matplotlib.pyplot as plt
